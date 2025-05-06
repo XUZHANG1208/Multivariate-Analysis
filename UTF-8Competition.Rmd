@@ -39,7 +39,7 @@ Look at the data, which variables are categorical, which are numerical?
 To check normality you can do in several ways: drawing histogram or calculation shapiro wilk test.
 
 ```{r}
-#histogram of bear and cost
+#histogram of protein and factors
 protein$RedMeat
 hist(protein$RedMeat)
 shapiro.test(protein$RedMeat)

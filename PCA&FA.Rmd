@@ -82,7 +82,7 @@ KMO(Beer2)
 ```
 ```{r}
 
-BeerClean <- Beer2[, KMO(Beer2)$MSAi > 0.515] # Get rid of all variables with MSA < 0.50
+BeerClean <- Beer2[, KMO(Beer2)$MSAi > 0.515] # Get rid of all variables with MSA < 0.50, to get rid of social economic status because it is not related to the beer itself.
 
 KMO(BeerClean)$MSAi
 round( KMO(BeerClean)$MSA, 2 )
@@ -94,11 +94,13 @@ library(psych)
 cortest.bartlett(BeerClean)
 
 ```
+if p<0.05, then we reject Null hypothesis that there are no common factors in my data. and we accet Alternative Hypothesis that there are common factors.
 
 ```{r}
 
 scree(BeerClean, pc=FALSE) 
 
+scree(BeerClean, pc=TRUE)
 ```
 ```{r}
 ev <- eigen(cor(BeerClean)) # get eigenvalues

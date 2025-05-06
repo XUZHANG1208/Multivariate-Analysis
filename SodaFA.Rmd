@@ -1,0 +1,169 @@
+---
+title: "soda"
+output: html_document
+date: "2025-05-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r cars}
+Soda <- read.csv("~/Desktop/r-project/Multivariate Analysis/Soda.txt", dec=",")
+head(Soda, 12)
+summary(Soda)
+
+#checking missing data 
+colSums(is.na(Soda))
+missings <- colSums(is.na(Soda))
+summary(missings)
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+#histogram of soda and factors
+Soda$X1.Refreshing.taste
+hist(Soda$X1.Refreshing.taste)
+shapiro.test(Soda$X1.Refreshing.taste)
+
+Soda$X2.Fewer.calories
+hist(Soda$X2.Fewer.calories)
+shapiro.test(Soda$X2.Fewer.calories)
+
+Soda$X3.Quenches.thirst
+hist(Soda$X3.Quenches.thirst)
+shapiro.test(Soda$X3.Quenches.thirst)
+
+Soda$X4.Sweet.taste
+hist(Soda$X4.Sweet.taste)
+shapiro.test(Soda$X4.Sweet.taste)
+
+Soda$X5.Energy
+hist(Soda$X5.Energy)
+shapiro.test(Soda$X5.Energy)
+
+Soda$X6.Environmentally.friendly.packaging
+hist(Soda$X6.Environmentally.friendly.packaging)
+shapiro.test(Soda$X6.Environmentally.friendly.packaging)
+
+Soda$X7.Minerals.and.vitamins
+hist(Soda$X7.Minerals.and.vitamins)
+shapiro.test(Soda$X7.Minerals.and.vitamins)
+
+Soda$X8.Unique.flavor
+hist(Soda$X8.Unique.flavor)
+shapiro.test(Soda$X8.Unique.flavor)
+
+Soda$X9.Healthy
+hist(Soda$X9.Healthy)
+shapiro.test(Soda$X9.Healthy)
+
+Soda$X10.For.when.very.thirsty
+hist(Soda$X10.For.when.very.thirsty)
+shapiro.test(Soda$X10.For.when.very.thirsty)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+plot(Soda$X3.Quenches.thirst, Soda$X10.For.when.very.thirsty)
+```
+```{r}
+#calculating correlations between 10 variables
+library(RcmdrMisc)
+library(psych)
+
+Soda2 <- na.omit(Soda)
+SodaClean<-Soda2[,3:12]
+
+rcorr.adjust(SodaClean)
+
+
+
+
+
+r <- rcorr.adjust(SodaClean, c("pearson"))
+
+corPlot(r$R$r, numbers=TRUE, cex = 0.5)
+```
+#calculating KMO value
+```{r}
+
+library(psych)
+KMO(SodaClean)
+
+```
+
+
+```{r}
+SodaFinal <- SodaClean[, KMO(SodaClean)$MSAi > 0.515] # Get rid of all variables with MSA < 0.50
+KMO(SodaFinal)$MSAi
+round( KMO(SodaFinal)$MSA, 2 )
+```
+
+```{r}
+cortest.bartlett(SodaFinal)
+```
+
+```{r}
+scree(SodaFinal, pc=FALSE) 
+
+scree(SodaFinal, pc=TRUE)
+```
+
+
+```{r}
+ev <- eigen(cor(SodaFinal)) # get eigenvalues
+ev$values
+```
+
+#FA
+
+```{r}
+fa.parallel(SodaFinal, fa="fa")
+```
+
+
+```{r}
+Nfacs <- 3 # This is for four factors. You can change this as needed.
+
+fit <- factanal(SodaFinal, Nfacs, rotation="promax")
+
+
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+```
+
+when factor numbers are three, the model gives the optimal predictability and it indicates that the included factors are sufficient to account for the variation. 
+
+```{r}
+load <- fit$loadings[,1:2]
+plot(load,type="p") # set up plot
+text(load,labels=names(SodaFinal),cex=.7)
+```
+there are clustering of factors, soda taste-related factors tend to gather at the top left. Health and environment related factors gather around the bottom left, leaving other factors around the bottom right. 
+
+```{r}
+loads <- fit$loadings
+
+fa.diagram(loads)
+```
+
+
+```{r}
+dim(fit$loadings)
+
+round(fit$loadings[1:6,], 2)
+```
+```{r}
+FactorLoadings <- round(fit$loadings[1:6,], 2)
+
+write.csv(FactorLoadings, file="SodaFacLoads.csv")
+```
+

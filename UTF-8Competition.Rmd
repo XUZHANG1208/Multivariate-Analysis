@@ -1,0 +1,163 @@
+---
+title: "Competition I. Multivariate Statistics"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Competition I. 
+
+Doanload protein.txt data.
+Data is about protein consumption in 25 European countries for nine food groups: Red Meat, White Meat, Eggs, Milk, Fish, Cereals, Strach, Nuts, Fruits and Vegetables.
+
+### Research question: How food consumption is grouped? How many groups are there?  
+
+# Steps to do:
+
+### 1. Import the data
+
+```{r}
+
+protein <- read.csv("~/Desktop/r-project/Multivariate Analysis/UTF-8protein.txt", dec=",")
+head(protein, 10)
+summary(protein)
+
+#checking missing data 
+colSums(is.na(protein))
+missings <- colSums(is.na(protein))
+summary(missings)
+```
+
+Look at the data, which variables are categorical, which are numerical? 
+
+### 2. Check for normality
+
+To check normality you can do in several ways: drawing histogram or calculation shapiro wilk test.
+
+```{r}
+#histogram of bear and cost
+protein$RedMeat
+hist(protein$RedMeat)
+shapiro.test(protein$RedMeat)
+
+protein$WhiteMeat
+hist(protein$WhiteMeat)
+shapiro.test(protein$WhiteMeat)
+
+protein$Eggs
+hist(protein$Eggs)
+shapiro.test(protein$Eggs)
+
+protein$Milk
+hist(protein$Milk)
+shapiro.test(protein$Milk)
+
+protein$Fish
+hist(protein$Fish)
+shapiro.test(protein$Fish)
+
+protein$Cereals
+hist(protein$Cereals)
+shapiro.test(protein$Cereals)
+
+protein$Starch
+hist(protein$Starch)
+shapiro.test(protein$Starch)
+
+protein$Nuts
+hist(protein$Nuts)
+shapiro.test(protein$Nuts)
+
+
+
+```
+
+### 3. Plot associations between Red Meat and White Meat consuption
+
+```{r}
+
+plot(protein$RedMeat, protein$WhiteMeat)
+
+```
+
+
+### 4. Calculate correlations between all 9 variables
+
+Before you calculate all to all correlations, please choose a subset of only numerical data first.
+Create a new dataframe that has all observations (rows) but only numerical variables (columns) from the second till the last.
+
+You can find this information in HELP:
+If data are not normaly distributed, you can choose Spearman correlation.
+Pearson is a default option.
+If you have missing data, you can also choose how you want to deal with missing data (paierwise or to take only full complete cases). Observations are filtered for missing data, and only complete observations are used as default option.
+
+rcorr.adjust(x, type = c("pearson", "spearman"), 
+	use=c("complete.obs", "pairwise.complete.obs"))
+
+To do: Plot correlation matrix with the correlation values on top visible.
+
+```{r}
+
+# !!!!! Tip. you can change it in your way
+protein2 <- protein[, 2:10]
+
+library(RcmdrMisc)
+r <- rcorr.adjust(protein2, c("pearson"))
+
+library(psych)
+corPlot(r$R$r, numbers=TRUE)
+
+
+```
+
+### 5. Calculate variances
+
+We have now 9 variables, so PCA will calculate 9 PCs. 
+We can see how much variance is explained by each component. Check Cumulative Proportion!
+
+if you choose loadings = T, you can see the weights of each variable in linear regression that explains PCs.
+
+```{r}
+
+pca.cov = princomp(x = protein2)  # By default, it uses the covariance matrix to perform PCA
+# if you want to use correlations add cor = TRUE
+
+summary(pca.cov, loadings = T)
+biplot(pca.cov)
+
+```
+
+### 6. Draw a scree plot
+
+Elbow rule to decide on a number of components
+
+```{r}
+
+library(psych)
+KMO(protein2)
+proteinClean <- protein2[, KMO(protein2)$MSAi > 0.515] # Get rid of all variables with MSA < 0.50
+
+KMO(proteinClean)$MSAi
+round( KMO(proteinClean)$MSA, 2 )
+
+cortest.bartlett(proteinClean)
+scree(proteinClean, pc=FALSE) 
+```
+
+### 7. Calculate eigen values
+
+Eigenvalues above 1 also indicate importance of components.
+
+```{r}
+
+ev <- eigen(cor(proteinClean)) # get eigenvalues
+ev$values
+
+```
+
+Finally, what is your take away message from the exercise? 
+

@@ -1,0 +1,121 @@
+---
+title: "Competititon III. Correspondence analysis"
+author: "Roma Siugzdaite"
+date: "2025-05-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Competition III.
+
+HairEyeColor dataset. Distribution of hair and eye color and sex in 592 statistics students.
+
+```{r }
+
+data(HairEyeColor)
+HairEyeColor
+hair_eye = as.data.frame(HairEyeColor) # just keep your data in a data frame
+
+```
+
+## Make a contingency table
+
+```{r}
+#  contingency table for hair and eye color
+library("FactoMineR")
+library("factoextra")
+library(ISLR)
+library(tidyverse)
+library(Rfast)
+library(MASS)
+
+hair_eye.table <- prop.table(hair_eye.table)
+addmargins(hair_eye.table)
+
+```
+
+## Plot a mosaicplot
+
+Prepare frequencies to plot 
+```{r}
+library("FactoMineR")
+library("factoextra")
+hair_eye.table <- xtabs(Freq ~ Eye + Hair, data=hair_eye)
+mosaicplot(hair_eye.table, color = (1:6), main = "Eye vs Hair")
+
+```
+
+### Chi square test
+
+```{r}
+
+chisq.test(hair_eye.table)
+
+```
+
+
+## Run Correspondence Analysis
+
+```{r}
+CA(hair_eye.table, ncp = 5, graph = TRUE)
+
+res.ca <- CA(hair_eye.table, graph = FALSE)
+
+eig.val <- get_eigenvalue(res.ca)
+eig.val
+
+
+```
+
+
+
+## Plot CA in 2 dimensions
+
+```{r}
+fviz_ca_biplot(res.ca, repel = TRUE)
+```
+
+
+Interpretation???
+
+####################### 
+
+## NEW DATA Children
+
+####################### 
+
+The data used here is a contingency table that summarizes the answers given by different categories of people to the following question : according to you, what are the reasons that can make hesitate a woman or a couple to have children? A data frame with 18 rows and 8 columns. Rows represent the different reasons mentioned, columns represent the different categories (education, age) people belong to.
+
+```{r}
+
+library(FactoMineR)
+data(children)
+children
+children <- as.data.frame(children) # just keep your data in a data frame
+
+res.ca <- CA(children, row.sup = 15:18, col.sup = 6:8)
+summary(res.ca)
+
+
+## Ellipses for 5 the active elements
+ellipseCA(res.ca,ellipse="col",col.col.ell=c(rep("blue",5),rep("transparent",3)), invisible=c("row.sup","col.sup"))
+
+```
+
+Interpretation?
+
+# Third dataset: Titanic
+
+Question: How we can look at Survival depending on the Class of the tickets? 
+
+Question: How Survival depends on Gender?
+
+```{r}
+Titanic
+Titanic <- as.data.frame(Titanic) # just keep your data 
+```
+
+

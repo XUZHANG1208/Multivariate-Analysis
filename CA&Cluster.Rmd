@@ -182,7 +182,7 @@ options(repos = c(
     CRAN = 'https://cloud.r-project.org'))
 
 # Install ggord
-#install.packages('ggord')
+install.packages('ggord')
 library(ggord)
 ```
 
@@ -253,7 +253,7 @@ linear
 
 The first discriminant function is a linear combination of the four variables.
 
-Percentage separations achieved by the first discriminant function is 99.37% (sum of all coeficients of linear discriminants) and second is 0.63%
+Percentage separations achieved by the first discriminant function is 99.37% (sum of all coeficients of linear discriminants) and second is ???
 
 ```{r}
 attributes(linear)
